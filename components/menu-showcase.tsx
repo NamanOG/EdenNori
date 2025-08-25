@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Plus, Flame, Star, Clock } from "lucide-react"
+import { Plus, Flame, Star, Clock, Search } from "lucide-react"
 
 const menuCategories = [
   { id: "trending", name: "Trending Now", icon: "🔥" },
@@ -76,11 +76,16 @@ const dishes = [
 export function MenuShowcase() {
   const [activeCategory, setActiveCategory] = useState("trending")
   const [hoveredDish, setHoveredDish] = useState<number | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
 
-  const filteredDishes =
+  const filteredDishes = 
     activeCategory === "trending"
-      ? dishes.filter((dish) => dish.isTrending)
-      : dishes.filter((dish) => dish.category === activeCategory)
+      ? dishes.filter((dish) => dish.isTrending && 
+          (dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+           dish.description.toLowerCase().includes(searchQuery.toLowerCase())))
+      : dishes.filter((dish) => dish.category === activeCategory &&
+          (dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+           dish.description.toLowerCase().includes(searchQuery.toLowerCase())))
 
   return (
     <section className="py-20 bg-gradient-to-b from-black to-gray-900">
@@ -96,32 +101,47 @@ export function MenuShowcase() {
             <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"> Cloud</span>
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Every dish is precision-crafted in our tech-enabled cloud kitchen using molecular gastronomy and traditional
-            techniques
+            Fresh ingredients meet culinary innovation in our modern kitchen, where authentic flavors 
+            are enhanced with contemporary techniques
           </p>
         </div>
 
         {/* Category Tabs */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {menuCategories.map((category) => (
-            <Button
-              key={category.id}
-              variant={activeCategory === category.id ? "default" : "outline"}
-              className={`px-6 py-3 rounded-full transition-all duration-300 ${
-                activeCategory === category.id
-                  ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0"
-                  : "border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
-              }`}
-              onClick={() => setActiveCategory(category.id)}
-            >
-              <span className="mr-2">{category.icon}</span>
-              {category.name}
-            </Button>
-          ))}
+        <div className="space-y-6">
+          {/* Search Bar */}
+          <div className="relative max-w-md mx-auto">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search dishes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-gray-900/50 border border-gray-700 rounded-full text-white placeholder:text-gray-400 focus:outline-none focus:border-purple-500/50 backdrop-blur-sm"
+            />
+          </div>
+
+          {/* Category Buttons */}
+          <div className="flex flex-wrap justify-center gap-4">
+            {menuCategories.map((category) => (
+              <Button
+                key={category.id}
+                variant={activeCategory === category.id ? "default" : "outline"}
+                className={`px-6 py-3 rounded-full transition-all duration-300 ${
+                  activeCategory === category.id
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0"
+                    : "border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                }`}
+                onClick={() => setActiveCategory(category.id)}
+              >
+                <span className="mr-2">{category.icon}</span>
+                {category.name}
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* Dishes Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
           {filteredDishes.map((dish) => (
             <Card
               key={dish.id}
@@ -199,6 +219,25 @@ export function MenuShowcase() {
               )}
             </Card>
           ))}
+        </div>
+
+        {/* No Results State */}
+        {filteredDishes.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-400 text-lg mb-2">No dishes found</p>
+            <p className="text-gray-500 text-sm">Try adjusting your search or category filter</p>
+          </div>
+        )}
+
+        {/* View Full Menu Button */}
+        <div className="text-center mt-16">
+          <Button
+            size="lg"
+            variant="outline"
+            className="border-2 border-purple-500 text-purple-400 hover:bg-purple-500/10 px-8 py-3 rounded-full text-lg font-medium bg-transparent"
+          >
+            View Full Menu
+          </Button>
         </div>
       </div>
     </section>
