@@ -1,4 +1,4 @@
-x# 🍣 EdenNori - Asian Cloud Kitchen
+# 🍣 EdenNori - Asian Cloud Kitchen
 
 ![EdenNori](./public/images/brand_logo.png)
 
